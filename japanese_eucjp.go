@@ -1,0 +1,206 @@
+package chardet
+
+var eucjp_map = map[rune]int{
+	0xa4ce: 0x00,
+	0xa4a4: 0x01,
+	0xa4bf: 0x02,
+	0xa4c8: 0x03,
+	0xa4ab: 0x04,
+	0xa4c6: 0x05,
+	0xa4b7: 0x06,
+	0xa4ca: 0x07,
+	0xa4cb: 0x08,
+	0xa4c3: 0x09,
+	0xa4a6: 0x0a,
+	0xa4cf: 0x0b,
+	0xa4ac: 0x0c,
+	0xa4c7: 0x0d,
+	0xa4eb: 0x0e,
+	0xa4f2: 0x0f,
+	0xa4f3: 0x10,
+	0xa4b3: 0x11,
+	0xa4e9: 0x12,
+	0xa4bd: 0x13,
+	0xa4a2: 0x14,
+	0xa4ec: 0x15,
+	0xa4e2: 0x16,
+	0xa4de: 0x17,
+	0xa5f3: 0x18,
+	0xa5ed: 0x19,
+	0xa5b9: 0x1a,
+	0xa5c8: 0x1b,
+	0xa5eb: 0x1c,
+	0xa5ec: 0x1d,
+	0xa4c0: 0x1e,
+	0xa4e8: 0x1f,
+	0xa4db: 0x20,
+	0xa4e4: 0x21,
+	0xa4ea: 0x22,
+	0xa4ad: 0x23,
+	0xa4a8: 0x24,
+	0xa4b1: 0x25,
+	0xa4af: 0x26,
+	0xa4aa: 0x27,
+	0xa4df: 0x28,
+	0xa4e7: 0x29,
+	0xa4e3: 0x2a,
+	0xa4c4: 0x2b,
+	0xa4c1: 0x2c,
+	0xa4d1: 0x2d,
+	0xa4b8: 0x2e,
+	0xa4c9: 0x2f,
+	0xa4ba: 0x30,
+	0xa4b9: 0x31,
+	0xa4b4: 0x32,
+	0xa4d2: 0x33,
+	0xa4ed: 0x34,
+	0xa4d0: 0x35,
+	0xa4b2: 0x36,
+	0xa4bb: 0x37,
+	0xa5c9: 0x38,
+	0xa5af: 0x39,
+	0xa5b0: 0x3a,
+	0xa5c1: 0x3b,
+	0xa1bc: 0x3c,
+	0xa5a4: 0x3d,
+	0xa5bf: 0x3e,
+	0xa5c6: 0x3f,
+	0xa5ea: 0x40,
+	0xa5e9: 0x41,
+	0xa5b5: 0x42,
+	0xa5df: 0x43,
+	0xa5e1: 0x44,
+	0xa5d3: 0x45,
+	0xa5b3: 0x46,
+	0xa5d9: 0x47,
+	0xa5aa: 0x48,
+	0xa5ce: 0x49,
+}
+
+// euc-jp (japanese)
+// [\x00-\x7F]
+// [\xA1-\xFE]{2}
+// \x8F[\xA1-\xFE]{2}
+// \x8E[\xA1-\xDF]
+type eucJP struct {
+	byte
+	last int
+	curr rune
+	hold [30]struct {
+		num int
+		sub map[int]int
+	}
+}
+
+func newEucJP() *eucJP {
+	ans := &eucJP{}
+	ans.last = -1
+	for i := 0; i < 30; i++ {
+		m := map[int]int{}
+		for k, _ := range freq_sub[i] {
+			m[k] = 0
+		}
+		ans.hold[i].sub = m
+	}
+	return ans
+}
+
+func (e eucJP) String() string {
+	return "euc-jp"
+}
+
+func (e *eucJP) Feed(x byte) bool {
+	defer func() {
+		if i, ok := eucjp_map[e.curr]; ok {
+			if i < 30 {
+				e.hold[i].num++
+			}
+			if e.last >= 0 {
+				m := e.hold[e.last].sub
+				if _, ok := m[i]; ok {
+					m[i]++
+				}
+			}
+			if i < 30 {
+				e.last = i
+			} else {
+				e.last = -1
+			}
+		} else {
+			e.last = -1
+		}
+	}()
+	if e.byte == 0 {
+		if x >= 0x00 && x <= 0x7F {
+			e.curr = rune(x)
+			return true
+		}
+		if x >= 0xA1 && x <= 0xFE {
+			e.byte = 1
+			e.curr = rune(x)
+			return true
+		}
+		if x == 0x8F {
+			e.byte = 2
+			e.curr = 0x8F
+			return true
+		}
+		if x == 0x8E {
+			e.byte = 3
+			e.curr = 0x8E
+			return true
+		}
+	} else if e.byte < 3 {
+		if x >= 0xA1 && x <= 0xFE {
+			e.byte -= 1
+			e.curr = (e.curr << 8) | rune(x)
+			return true
+		}
+	} else {
+		if x >= 0xA1 && x <= 0xDE {
+			e.byte = 0
+			e.curr = (e.curr << 8) | rune(x)
+			return true
+		}
+	}
+	return false
+}
+
+func (e *eucJP) Priority() float64 {
+	sub := func(p map[int]int, r map[int]float64) float64 {
+		s, f := 0, 0.0
+		for _, x := range p {
+			s += x
+		}
+		if s == 0 {
+			return 0
+		}
+		for i, x := range p {
+			k := float64(x)/float64(s)*100 - r[i]
+			if k >= 0 {
+				f += k
+			} else {
+				f -= k
+			}
+		}
+		return 1 - f/100
+	}
+	d := 0
+	for _, x := range e.hold {
+		d += x.num
+	}
+	if d == 0 {
+		return 0
+	}
+	p, f := 0.0, 0.0
+	for i, x := range e.hold {
+		k := float64(x.num)/float64(d)*100 - freq_dad[i]
+		if k >= 0 {
+			f += k
+		} else {
+			f -= k
+		}
+		p += sub(x.sub, freq_sub[i])
+	}
+	return (p + 1 - f/100) / 31
+}
