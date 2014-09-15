@@ -10,8 +10,8 @@ type detectplus interface {
 	Priority() float64
 }
 
-func checkUnicode(data []byte) string {
-	lst := []detect{&utf8{}, &utf16be{}, &utf16le{}, &utf32be{}, &utf32le{}}
+func checkBasic(data []byte) string {
+	lst := []detect{&utf8{}, &utf16be{}, &utf16le{}, &utf32be{}, &utf32le{},&iso2022jp{}}
 	for _, c := range data {
 		for i, l := 0, len(lst); i < l; {
 			if !lst[i].Feed(c) {
@@ -98,7 +98,7 @@ func Check(data []byte) string {
 	if m = checkBom(data); m != "" {
 		return m
 	}
-	if m = checkUnicode(data); m != "" {
+	if m = checkBasic(data); m != "" {
 		return m
 	}
 	if m, p = checkChinese(data); m != "" && p > 0 {
@@ -107,11 +107,11 @@ func Check(data []byte) string {
 	if n, q = checkJapanese(data); n != "" && q > 0 {
 		return n
 	}
-	if m == "" {
-		return n
-	}
 	if n == "" {
 		return m
+	}
+	if m == "" {
+		return n
 	}
 	if p > q {
 		return m
