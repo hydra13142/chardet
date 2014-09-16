@@ -1,7 +1,7 @@
 package chardet
 
 // 使用bom来确定编码格式
-func checkBom(data []byte) string {
+func checkbom(data []byte) string {
 	if len(data) >= 2 {
 		if string(data[:2]) == "\xFE\xFF" {
 			return "utf16-be"
