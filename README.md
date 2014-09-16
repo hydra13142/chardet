@@ -12,13 +12,20 @@ detect text encoding, like python chardet, but for go
 1种日文格式euc-kr；
 不支持其他语种和编码格式的探测。
 
-本包只有一个函数：
+本包只有两个函数：
 
-    func Check([]byte) string
+	// 本函数返回文本最可能的编码格式
+    func Mostlike([]byte) string
+	
+	// 本函数返回文本所有可能的编码格式，可能性越高越靠前
+	func Possible([]byte) []string
 
-该函数用于探测格式。如果无法探测到编码格式，会返回空字符串。
+Mostlike函数如果无法探测到编码格式，会返回空字符串。
 如果发现该文本符合多个编码格式，会优先返回utf-8格式；
-否则进一步检测字符分布，返回最匹配的。
+否则会进一步检测字符分布，返回最匹配的。
+
+Possible函数会返回全部可能的编码格式，utf-8格式优先于其他unicode格式；
+会根据字符分布来排布各个格式，使可能性越高的越靠前。
 
 各编码格式对应字符串如下
 
