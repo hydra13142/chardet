@@ -23,10 +23,10 @@ detect text encoding, like python chardet, but for go
 各编码格式对应字符串如下
 
 * **UTF8**  "utf-8"
-* **UTF16 Big-Ending** "utf-16BE"
-* **UTF16 Little-Ending** "utf-16LE"
-* **UTF32 Big-Ending** "utf-32BE"
-* **UTF32 Little-Ending** "utf-32LE"
+* **UTF16 Big-Ending** "utf-16be"
+* **UTF16 Little-Ending** "utf-16le"
+* **UTF32 Big-Ending** "utf-32be"
+* **UTF32 Little-Ending** "utf-32le"
 * **HZ-GB2312** "hz-gb2312"
 * **GBK** "gbk"
 * **GB18030** "gb18030"
