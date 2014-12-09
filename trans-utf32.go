@@ -16,7 +16,7 @@ type u32bt8 struct {
 }
 
 // UTF-16BE => UTF-8
-func (u u32bt8) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+func (u *u32bt8) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	ld, ls := len(dst), len(src)
 	us := []rune{}
 	for nSrc < ls {
@@ -52,12 +52,16 @@ func (u u32bt8) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 	return
 }
 
+func (u *u32bt8) Reset() {
+	u.hold = nil
+}
+
 type u32lt8 struct {
 	hold []byte
 }
 
 // UTF-16BE => UTF-8
-func (u u32lt8) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+func (u *u32lt8) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	ld, ls := len(dst), len(src)
 	us := []rune{}
 	for nSrc < ls {
@@ -93,12 +97,16 @@ func (u u32lt8) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 	return
 }
 
+func (u *u32lt8) Reset() {
+	u.hold = nil
+}
+
 type u8t32b struct {
 	hold []byte
 }
 
 // UTF-8 => UTF-16BE
-func (u u8t32b) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+func (u *u8t32b) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	ld, ls := len(dst), len(src)
 	rs := []rune{}
 	for nSrc < ls {
@@ -131,12 +139,16 @@ func (u u8t32b) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 	return
 }
 
+func (u *u8t32b) Reset() {
+	u.hold = nil
+}
+
 type u8t32l struct {
 	hold []byte
 }
 
 // UTF-8 => UTF-16BE
-func (u u8t32l) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+func (u *u8t32l) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	ld, ls := len(dst), len(src)
 	rs := []rune{}
 	for nSrc < ls {
@@ -167,6 +179,10 @@ func (u u8t32l) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 	}
 	nDst = lu
 	return
+}
+
+func (u *u8t32l) Reset() {
+	u.hold = nil
 }
 
 type utf32le struct{}
