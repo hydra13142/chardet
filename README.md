@@ -1,6 +1,12 @@
-chardet
-=======
+#chardet
 
+##history
+
+fix dependency from
+
+`code.google.com/p/go.text` TO `golang.org/x/text`
+
+##
 detect text encoding, like python chardet, but for go
 
 本包用于探测文本的编码格式。
