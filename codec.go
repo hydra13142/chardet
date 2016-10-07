@@ -1,14 +1,14 @@
 package chardet
 
 import (
-	"bytes"
-	"code.google.com/p/go.text/encoding"
-	"code.google.com/p/go.text/encoding/japanese"
-	"code.google.com/p/go.text/encoding/korean"
-	"code.google.com/p/go.text/encoding/simplifiedchinese"
-	"code.google.com/p/go.text/encoding/traditionalchinese"
-	"code.google.com/p/go.text/encoding/unicode"
-	"code.google.com/p/go.text/transform"
+	"bytes"                         
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/encoding/korean"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/traditionalchinese"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 	"errors"
 	"io"
 )
