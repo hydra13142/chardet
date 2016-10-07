@@ -1,6 +1,17 @@
-chardet
-=======
+#chardet
 
+##history
+
+fix dependency from
+
+`code.google.com/p/go.text` TO `golang.org/x/text`
+
+讲真，中英文混合的GBK会识别为UTF-16BE
+
+![](http://qq.yh31.com/tp/zjbq/201609231126325282.jpg)
+
+
+##
 detect text encoding, like python chardet, but for go
 
 本包用于探测文本的编码格式。
